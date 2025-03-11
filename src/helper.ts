@@ -28,7 +28,8 @@ export async function getS3URLs(files: TFile[], vault: Vault, url: string): Prom
 }
 
 export function generateResourceName(fileName: string, parent?: string, hash?: string) {
-	const [name, type] = fileName.split('.');
+	const [name, type] = [fileName.split(".").slice(0, -1).join("."), fileName.split(".").pop()];
+
 	if (hash)
 		return `${name}-${hash}.${type}`;
 	else
