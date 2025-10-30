@@ -47,13 +47,14 @@ export class S3Server {
 		const client = url.searchParams.get("client");
 		const bucket = url.searchParams.get("bucket");
 
-		if (url.host.includes("wasabisys") && path.startsWith("/")) {
+		const _client = this.getClient(client);
+		if ((_client?.client as any)?.host?.includes("wasabisys") && path.startsWith("/")) {
 			path = path.replace(/^\//, '');
 		}
 
 		void (async () => {
 			try {
-				const result = await this.getClient(client)?.getObject(path, bucket);
+				const result = await _client?.getObject(path, bucket);
 				res.setHeader('Content-type', mimeType.getMIME(ext) || 'text/plain');
 				result?.pipe(res);
 			} catch (e) {
