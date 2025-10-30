@@ -42,10 +42,14 @@ export class S3Server {
 		if (!req.url) return console.log("ERROR: URL is undefined");
 		const url = new URL(`${this.url}${req.url}`);
 		const ext = parseExt(url.pathname);
-		const path = decodeURI(url.pathname);
+		let path = decodeURI(url.pathname);
 		console.log(`fetching: ${url.toString()}`);
 		const client = url.searchParams.get("client");
 		const bucket = url.searchParams.get("bucket");
+
+		if (url.host.includes("wasabisys") && path.startsWith("/")) {
+			path = path.replace(/^\//, '');
+		}
 
 		void (async () => {
 			try {

@@ -97,7 +97,7 @@ export default class ObsidianS3 extends Plugin {
 			});
 
 		} else {
-			return this.credentialsError();
+			this.credentialsError();
 		}
 	}
 
@@ -116,15 +116,20 @@ export default class ObsidianS3 extends Plugin {
 
 			const s3 = server.getClient(id);
 			const s3Index = await s3.listObjects();
-			const doDelete = s3Index.filter((i) => !filter.includes(i.name));
+			const doDelete = s3Index.filter((i) => i.name !== undefined && !filter.includes(i.name));
 			if (doDelete.length === 0) {
 				new Notice(`[${id}] No object to delete.`);
 				continue;
 			}
 			new Notice(`[${id}] Found ${doDelete.length} un-used objects, deleting...`);
 			for (let y = 0; y < doDelete.length; y++) {
-				console.log(`[${id}] S3: Deleting ${doDelete[i].name}`);
-				await this.s3.removeObject(doDelete[i].name);
+				const doDeleteName = doDelete[i].name;
+				console.log(`[${id}] S3: Deleting ${doDeleteName}`);
+				for (let i = 0; i < doDelete.length; i++) {
+					if (doDeleteName != null) {
+						await this.s3.removeObject(doDeleteName);
+					}
+				}
 			}
 			new Notice(`[${id}] Deleted ${doDelete.length} objects.`);
 			new Notice(`[${id}] Current bucket size ${prettyBytes(await s3.getBucketSize())}`);
